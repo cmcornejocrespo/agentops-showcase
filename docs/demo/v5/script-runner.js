@@ -518,7 +518,13 @@ function isRunnerStep(stepId, skipSteps) {
   return !skipSteps.has(stepId);
 }
 
+function isLocalHost() {
+  const h = globalThis.location?.hostname ?? "";
+  return h === "localhost" || h === "127.0.0.1" || h === "0.0.0.0" || h === "";
+}
+
 async function checkProxyHealth(proxyUrl) {
+  if (!isLocalHost()) return "offline";
   try {
     const health = await fetchJson(`${proxyUrl}/api/health`, {
       signal: AbortSignal.timeout(8_000),
