@@ -206,7 +206,7 @@ test.describe('demo scenario consistency', () => {
     expect(stepDBefore.yamlPanel?.title).toContain('direct MaaS');
     const snippet = stepDBefore.yamlPanel?.snippet ?? '';
     expect(snippet).toContain('maas-direct');
-    expect(snippet).toContain('inference.local → MaaS');
+    expect(snippet).toContain('inference.local → GW → MaaS');
     expect(snippet).not.toContain('maas-guardrailed');
     expect(stepDBefore.yamlPanel?.defaultOpen).toBe(false);
   });
