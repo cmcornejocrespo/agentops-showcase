@@ -88,6 +88,11 @@ async function fetchJson(url, options = {}) {
   return data;
 }
 
+function isLocalHost() {
+  const h = globalThis.location?.hostname ?? "";
+  return h === "localhost" || h === "127.0.0.1" || h === "0.0.0.0" || h === "";
+}
+
 export function initObservabilityPanel({
   root,
   mount,
@@ -98,6 +103,7 @@ export function initObservabilityPanel({
   /** Start with body collapsed (v2/v3 compact companions). */
   defaultCollapsed = false,
 } = {}) {
+  if (!isLocalHost()) return null;
   const host = mount ?? root?.querySelector("[data-nr-observability]");
   if (!host) return null;
 
