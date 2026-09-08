@@ -88,7 +88,7 @@ openshell inference set \\
   --model <INFERENCE_MODEL> \\
   --no-verify
 
-# Path: inference.local → MaaS (direct)
+# Path: inference.local → GW → MaaS (direct)
 # Provider backend: MAAS_BASE_URL`;
 
 const INFERENCE_ROUTE_BEFORE = `# Active route (demo start)
@@ -96,21 +96,21 @@ openshell inference set \\
   --provider maas-direct \\
   --model <INFERENCE_MODEL> \\
   --no-verify
-# Path: inference.local → MaaS`;
+# Path: inference.local → GW → MaaS`;
 
 const INFERENCE_ROUTE_AFTER = `# After Change 2 (demo-enable-guardrails.sh)
 openshell inference set \\
   --provider maas-guardrailed \\
   --model <INFERENCE_MODEL> \\
   --no-verify
-# Path: inference.local → NeMo Guardrails → MaaS`;
+# Path: inference.local → GW → NeMo Guardrails → MaaS`;
 
 const INFERENCE_ROUTE_GUARDRAILED = `# inference route · maas-guardrailed
 openshell inference set \\
   --provider maas-guardrailed \\
   --model <INFERENCE_MODEL> \\
   --no-verify
-# Path: inference.local → NeMo Guardrails → MaaS`;
+# Path: inference.local → GW → NeMo Guardrails → MaaS`;
 
 const GUARDRAILS_SELF_CHECK_INPUT_SNIPPET = `# deploy/helm/guardrails/files/prompts.yml
 prompts:
@@ -432,7 +432,7 @@ export const NARRATIVE = {
       title: "Network recon script",
       timing: "Change 2",
       body: [
-        "Recon prompt on the direct path: inference.local → MaaS with no NeMo Guardrails in the hop.",
+        "Recon prompt on the direct path: inference.local → GW → MaaS with no NeMo Guardrails in the hop.",
       ],
       prompt: PROMPT_D,
       expected: null,
@@ -453,7 +453,7 @@ export const NARRATIVE = {
         active: ["oc", "ir", "gw", "maas"],
         inferencePath: "direct",
         inferenceRisk: true,
-        flows: [{ nodes: ["oc", "ir", "maas"], kind: "inference-risk" }],
+        flows: [{ nodes: ["oc", "ir", "gw", "maas"], kind: "inference-risk" }],
       },
       yamlPanel: YAML_PANELS.inferenceBaseline,
       subStep: { group: "D", phase: "before", index: 0, total: 2 },
@@ -485,7 +485,7 @@ export const NARRATIVE = {
       diagram: {
         active: ["oc", "ir", "gw", "nemo", "maas"],
         inferencePath: "nemo",
-        flows: [{ nodes: ["oc", "ir", "nemo", "maas"], kind: "inference-guarded" }],
+        flows: [{ nodes: ["oc", "ir", "gw", "nemo", "maas"], kind: "inference-guarded" }],
       },
       yamlPanel: YAML_PANELS.guardrails,
       yamlPanelV3: YAML_PANELS.guardrailsAfterV3,

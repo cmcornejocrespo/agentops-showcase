@@ -118,7 +118,7 @@ export const SCENARIO_CANVAS_CONFIG = {
         },
         nemo: {
           title: LAYER_NAMES.nemo,
-          description: "Before Change 2: inference.local points to direct MaaS. NeMo is off the hop.",
+          description: "Before Change 2: inference.local routes through GW to direct MaaS. NeMo is off the hop.",
         },
         maas: {
           title: LAYER_NAMES.maas,
@@ -151,7 +151,7 @@ export const SCENARIO_CANVAS_CONFIG = {
         },
         nemo: {
           title: LAYER_NAMES.nemo,
-          description: "After demo-enable-guardrails.sh, inference.local routes through NeMo Guardrails.",
+          description: "After demo-enable-guardrails.sh, inference.local routes through GW → NeMo Guardrails.",
         },
         maas: {
           title: LAYER_NAMES.maas,

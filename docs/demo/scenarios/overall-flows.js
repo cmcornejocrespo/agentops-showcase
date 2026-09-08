@@ -708,13 +708,18 @@ export const SCENARIO_D_BEFORE_MUTATIONS = [
   { step: 3, label: `2  ${LAYER_NAMES.openClaw} → ${LAYER_NAMES.ir}` },
   {
     step: 4,
-    label: `3  ${LAYER_NAMES.ir} → ${LAYER_NAMES.maas} · direct`,
+    label: `3  ${LAYER_NAMES.ir} → ${LAYER_NAMES.gw}`,
+    actions: [{ id: "l-gw", style: "highlight" }],
+  },
+  {
+    step: 5,
+    label: `3  ${LAYER_NAMES.gw} → ${LAYER_NAMES.maas} · direct`,
     actions: [{ id: "p-path", style: "highlight" }, { id: "l-rails", style: "highlight" }],
   },
-  { step: 5, label: `2  ${LAYER_NAMES.ir} → ${LAYER_NAMES.openClaw} · may generate script` },
-  { step: 6, label: `1  ${LAYER_NAMES.openClaw} → ${LAYER_NAMES.gw} · output` },
+  { step: 6, label: `2  ${LAYER_NAMES.ir} → ${LAYER_NAMES.openClaw} · may generate script` },
+  { step: 7, label: `1  ${LAYER_NAMES.openClaw} → ${LAYER_NAMES.gw} · output` },
   {
-    step: 7,
+    step: 8,
     label: `1  ${LAYER_NAMES.gw} → ${LAYER_NAMES.endUser} · no rails`,
     actions: [{ id: "p-expect", style: "highlight" }],
   },
@@ -734,18 +739,23 @@ export const SCENARIO_D_AFTER_MUTATIONS = [
   { step: 3, label: `2  ${LAYER_NAMES.openClaw} → ${LAYER_NAMES.ir}` },
   {
     step: 4,
-    label: `3  ${LAYER_NAMES.ir} → ${LAYER_NAMES.nemo}`,
-    actions: [{ id: "p-cmd", style: "highlight" }],
+    label: `3  ${LAYER_NAMES.ir} → ${LAYER_NAMES.gw}`,
+    actions: [{ id: "l-gw", style: "highlight" }],
   },
   {
     step: 5,
+    label: `3  ${LAYER_NAMES.gw} → ${LAYER_NAMES.nemo}`,
+    actions: [{ id: "p-cmd", style: "highlight" }],
+  },
+  {
+    step: 6,
     label: `3  ${LAYER_NAMES.nemo} → ${LAYER_NAMES.maas}`,
     actions: [{ id: "l-rails", style: "highlight" }],
   },
-  { step: 6, label: `2  ${LAYER_NAMES.ir} → ${LAYER_NAMES.openClaw} · filtered` },
-  { step: 7, label: `1  ${LAYER_NAMES.openClaw} → ${LAYER_NAMES.gw} · refusal` },
+  { step: 7, label: `2  ${LAYER_NAMES.ir} → ${LAYER_NAMES.openClaw} · filtered` },
+  { step: 8, label: `1  ${LAYER_NAMES.openClaw} → ${LAYER_NAMES.gw} · refusal` },
   {
-    step: 8,
+    step: 9,
     label: `1  ${LAYER_NAMES.gw} → ${LAYER_NAMES.endUser} · blocked`,
     actions: [{ id: "p-expect", style: "highlight" }],
   },
@@ -780,13 +790,22 @@ export const SCENARIO_D_BEFORE_STEPS = [
     ...ARROW.ocToIr,
   },
   {
-    text: `Direct path — ${LAYER_NAMES.ir} → ${LAYER_NAMES.maas} (${LAYER_NAMES.nemo} off)`,
+    text: `${LAYER_NAMES.ir} routes through ${LAYER_NAMES.gw}`,
     mode: "arrow",
     from: "ir",
+    to: "gw",
+    color: COLORS.warn,
+    num: 3,
+    ...ARROW.irToGw,
+  },
+  {
+    text: `Direct path — ${LAYER_NAMES.gw} → ${LAYER_NAMES.maas} (${LAYER_NAMES.nemo} off)`,
+    mode: "arrow",
+    from: "gw",
     to: "maas",
     color: COLORS.warn,
     num: 3,
-    ...ARROW.irToMaas,
+    ...ARROW.gwToMaas,
   },
   {
     text: `Response to ${LAYER_NAMES.openClaw} — model may generate script`,
@@ -846,13 +865,22 @@ export const SCENARIO_D_AFTER_STEPS = [
     ...ARROW.ocToIr,
   },
   {
-    text: `${LAYER_NAMES.ir} → ${LAYER_NAMES.nemo}`,
+    text: `${LAYER_NAMES.ir} routes through ${LAYER_NAMES.gw}`,
     mode: "arrow",
     from: "ir",
+    to: "gw",
+    color: COLORS.nemo,
+    num: 3,
+    ...ARROW.irToGw,
+  },
+  {
+    text: `${LAYER_NAMES.gw} → ${LAYER_NAMES.nemo}`,
+    mode: "arrow",
+    from: "gw",
     to: "nemo",
     color: COLORS.nemo,
     num: 3,
-    ...ARROW.irToNemo,
+    ...ARROW.gwToNemo,
   },
   {
     text: `${LAYER_NAMES.nemo} → ${LAYER_NAMES.maas}`,
@@ -951,7 +979,7 @@ export const LAYER_BOARDS = {
     ],
     body: [
       { value: "Recon script: port scan 10.0.0.0/24 · CVE lookup", style: "add", id: "p-probe" },
-      { value: "Path: inference.local → MaaS (direct)", style: "add", id: "p-path" },
+      { value: "Path: inference.local → GW → MaaS (direct)", style: "add", id: "p-path" },
       { value: "Expected: model may generate script (no rails)", style: "add", id: "p-expect" },
     ],
   },
@@ -963,7 +991,7 @@ export const LAYER_BOARDS = {
     ],
     body: [
       { value: "Change 2: ./scripts/demo-enable-guardrails.sh", style: "add", id: "p-cmd" },
-      { value: "Path: inference.local → NeMo → MaaS", style: "add", id: "p-path" },
+      { value: "Path: inference.local → GW → NeMo → MaaS", style: "add", id: "p-path" },
       { value: "Same prompt → refusal / filtered", style: "add", id: "p-expect" },
     ],
   },
@@ -1379,21 +1407,21 @@ const OVERALL_SCENARIO_C_AFTER = composeOverallFlow([
 
 const OVERALL_SCENARIO_D_BEFORE = composeOverallFlow([
   {
-    steps: SCENARIO_D_BEFORE_STEPS.slice(0, 4),
-    mutations: sliceMutations(SCENARIO_D_BEFORE_MUTATIONS, 1, 4),
+    steps: SCENARIO_D_BEFORE_STEPS.slice(0, 5),
+    mutations: sliceMutations(SCENARIO_D_BEFORE_MUTATIONS, 1, 5),
   },
   buildInferenceMaasLlmBlock(),
   {
-    steps: SCENARIO_D_BEFORE_STEPS.slice(4),
-    mutations: sliceMutations(SCENARIO_D_BEFORE_MUTATIONS, 5, 7),
+    steps: SCENARIO_D_BEFORE_STEPS.slice(5),
+    mutations: sliceMutations(SCENARIO_D_BEFORE_MUTATIONS, 6, 8),
   },
   buildTraceGwBlock(ARROW_SCENARIO_OC_GW),
 ]);
 
 const OVERALL_SCENARIO_D_AFTER = composeOverallFlow([
   {
-    steps: SCENARIO_D_AFTER_STEPS.slice(0, 5),
-    mutations: sliceMutations(SCENARIO_D_AFTER_MUTATIONS, 1, 5),
+    steps: SCENARIO_D_AFTER_STEPS.slice(0, 6),
+    mutations: sliceMutations(SCENARIO_D_AFTER_MUTATIONS, 1, 6),
   },
   {
     steps: [
@@ -1410,8 +1438,8 @@ const OVERALL_SCENARIO_D_AFTER = composeOverallFlow([
     mutations: [{ step: 1, label: `3  ${LAYER_NAMES.maas} → Guardrails LLM` }],
   },
   {
-    steps: SCENARIO_D_AFTER_STEPS.slice(5),
-    mutations: sliceMutations(SCENARIO_D_AFTER_MUTATIONS, 6, 8),
+    steps: SCENARIO_D_AFTER_STEPS.slice(6),
+    mutations: sliceMutations(SCENARIO_D_AFTER_MUTATIONS, 7, 9),
   },
   buildTraceGwBlock(ARROW_SCENARIO_OC_GW),
 ]);
